@@ -37,7 +37,7 @@ const PlaceeOrder = () => {
             </div>
             <hr />
             <div className="cart-total-details">
-              <p>Delivery Free</p>
+              <p>Delivery Free</p>  
               <p>${getTotalCartAmount()===0?0:2}</p>
             </div>
             <hr />
