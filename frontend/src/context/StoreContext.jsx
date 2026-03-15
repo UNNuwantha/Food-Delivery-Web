@@ -11,17 +11,30 @@ const StoreContextProvider=(props)=>{
     const [food_list,setFoodList] = useState([])
 
 
-    const addToCart = (itemId) => {
-        if(!cartItems[itemId]){
-            setCartItems((prev)=> ({...prev, [itemId]: 1}))
-        }
-        else{
-            setCartItems((prev)=> ({...prev, [itemId]: prev[itemId] + 1}))
+    const addToCart = async (itemId) => {
+        if(token){
+            const response = await axios.post(url+"/api/cart/add", {itemId}, {headers:{token}});
+            if(response.data.success){
+                setCartItems((prev)=> ({...prev, [itemId]: prev[itemId] ? prev[itemId] + 1 : 1}))
+            }
         }
     }
 
-    const removeFromCart = (itemId) => {
-        setCartItems((prev)=>({...prev, [itemId]: prev[itemId]-1}))
+    const removeFromCart = async (itemId) => {
+        if(token){
+            const response = await axios.post(url+"/api/cart/remove", {itemId}, {headers:{token}});
+            if(response.data.success){
+                setCartItems((prev)=>{
+                    const newCart = {...prev};
+                    if(newCart[itemId] > 1){
+                        newCart[itemId] -= 1;
+                    } else {
+                        delete newCart[itemId];
+                    }
+                    return newCart;
+                })
+            }
+        }
     }
 
    const getTotalCartAmount = () => {
@@ -41,15 +54,31 @@ const StoreContextProvider=(props)=>{
             setFoodList(response.data.data)
         }
      
+        const loadCartData = async (token) => {
+            try{
+                const response = await axios.get(url+"/api/cart/get", {headers:{token}});
+                setCartItems(response.data.cartData);
+            } catch(error){
+                console.log("Error loading cart:", error);
+            }
+        }
+     
         useEffect(()=>{
             async function loadData() {
              await fetchFoodList();
            if(localStorage.getItem("token")){
             setToken(localStorage.getItem("token"));
+            await loadCartData(localStorage.getItem("token"));
               }           
            }
               loadData();
         },[])
+
+        useEffect(()=>{
+            if(token){
+                loadCartData(token);
+            }
+        },[token])
         
 
     const contextValue ={
