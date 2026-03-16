@@ -34,6 +34,13 @@
 .place-order-right{
     width: 100%;
     max-width: max(40%,500px);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.place-order-right .cart-total{
+    width: 100%;
+    max-width: 420px;
 }
 
 .place-order .cart-total button{
