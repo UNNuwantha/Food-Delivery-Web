@@ -39,7 +39,7 @@ const Navbar = ({setShowLogin}) => {
         :<div className='navbar-profile' onMouseEnter={() => setShowProfileDropdown(true)} onMouseLeave={() => setShowProfileDropdown(false)}>
           <img src={assets.profile_icon} alt="" />
           <ul className={showProfileDropdown ? "navbar-profile-dropdown show" : "navbar-profile-dropdown"}>
-            <li><img src={assets.bag_icon} alt="" /><p>Orders</p></li>
+            <li onClick={()=>Navigate("/myorders")}><img src={assets.bag_icon} alt="" /><p>Orders</p></li>
             <hr />
             <li onClick={logout}><img src={assets.logout_icon} alt="" /><p>Logout</p></li>
             </ul>          

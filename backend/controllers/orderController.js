@@ -5,6 +5,7 @@ import Stripe from "stripe"
 //placing user order from frontend
 const placeOrder = async (req, res) => {
     const frontend_url = "http://localhost:5173"
+    
 
     if (!process.env.STRIPE_SECRET_KEY) {
         console.error("Missing STRIPE_SECRET_KEY environment variable")
@@ -14,7 +15,7 @@ const placeOrder = async (req, res) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
     try {
-        const userId = req.body.userId;
+        const userId = req.userId;
         const { items, amount, address, payment } = req.body;
 
         if (!userId || !items || !amount || !address) {
@@ -85,5 +86,16 @@ const verifyOrder = async (req,res) =>{
     }
 }
 
-export { placeOrder,verifyOrder }
+//user orders for frontend
+const userOrders = async(req,res) =>{
+      try {
+        const orders = await orderModel.find({userId:req.userId});
+        res.json({success:true,data:orders})
+      } catch (error) {
+        console.log(Error);
+        res.json({success:false,message:"Error"})
+      }
+}
+
+export { placeOrder,verifyOrder, userOrders}
 
