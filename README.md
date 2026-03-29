@@ -7,7 +7,7 @@
 
 A modern, full-stack food delivery application that connects hungry customers with delicious meals. Built with cutting-edge technologies for a seamless user experience.
 
-![Food Delivery App Screenshot](https://via.placeholder.com/800x400?text=App+Screenshot) <!-- Replace with actual screenshot -->
+![image alt](https://github.com/UNNuwantha/Food-Delivery-Web/blob/master/frontend/src/assets/image1.png?raw=true)
 
 ## ✨ Features
 
