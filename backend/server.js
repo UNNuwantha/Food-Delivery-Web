@@ -7,54 +7,62 @@ import userRouter from './routes/userRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
 
-
 dotenv.config()
 
-const startServer = async () => {
-    try {
-        // db connection
-        await connectDB();
+const app = express()
 
-        //app config
-        const app = express()
+//middleware
+app.use(express.json())
+app.use(cors())
+app.use("/images", express.static('uploads'))
 
+//api endpoints
+app.use("/api/food", foodRouter)
+app.use("/api/user", userRouter)
+app.use("/api/cart", cartRouter)
+app.use("/api/order", orderRouter)
 
-        //middleware
-        app.use(express.json())
-        app.use(cors())
-        app.use("/images", express.static('uploads'))
+app.get("/", (req, res) => {
+    res.send("API Working")
+})
 
-        //api endpoints
-        app.use("/api/food", foodRouter)
-        app.use("/api/user", userRouter)
-        app.use("/api/cart", cartRouter)
-        app.use("/api/order", orderRouter)
+// Error handling middleware
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({ success: false, message: 'Invalid JSON format' });
+    }
+    next(err);
+});
 
-        app.get("/", (req, res) => {
-            res.send("API Working")
-        })
+let dbConnected = false
 
-        // Error handling middleware
-        app.use((err, req, res, next) => {
-            if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-                return res.status(400).json({ success: false, message: 'Invalid JSON format' });
-            }
-            next(err);
-        });
-
-        if (process.env.NODE_ENV !== "production") {
-            const port = 4000
-            app.listen(port, () => {
-                console.log(`Server Started on http://localhost:${port}`)
-            })
-       
-        }
-    } catch (error) {
-        console.error('Failed to start server:', error)
-        process.exit(1)
+const ensureDbConnection = async () => {
+    if (!dbConnected) {
+        await connectDB()
+        dbConnected = true
     }
 }
 
-startServer()
+const handler = async (req, res) => {
+    try {
+        await ensureDbConnection()
+        return app(req, res)
+    } catch (error) {
+        console.error('Failed to handle request:', error)
+        return res.status(500).json({ success: false, message: 'Server error' })
+    }
+}
 
-export default startServer;
+if (!process.env.VERCEL) {
+    const port = process.env.PORT || 4000
+    ensureDbConnection().then(() => {
+        app.listen(port, () => {
+            console.log(`Server Started on http://localhost:${port}`)
+        })
+    }).catch((error) => {
+        console.error('Failed to start local server:', error)
+        process.exit(1)
+    })
+}
+
+export default handler
