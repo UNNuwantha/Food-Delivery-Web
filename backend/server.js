@@ -43,15 +43,15 @@ const ensureDbConnection = async () => {
     }
 }
 
-const handler = async (req, res) => {
+app.use(async (req, res, next) => {
     try {
         await ensureDbConnection()
-        return app(req, res)
+        next()
     } catch (error) {
-        console.error('Failed to handle request:', error)
-        return res.status(500).json({ success: false, message: 'Server error' })
+        console.error('Database connection failed:', error)
+        res.status(500).json({ success: false, message: 'Database connection failed' })
     }
-}
+})
 
 if (!process.env.VERCEL) {
     const port = process.env.PORT || 4000
@@ -65,4 +65,4 @@ if (!process.env.VERCEL) {
     })
 }
 
-export default handler
+export default app
