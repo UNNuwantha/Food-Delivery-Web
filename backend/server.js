@@ -14,10 +14,10 @@ const startServer = async () => {
     try {
         // db connection
         await connectDB();
-        
+
         //app config
         const app = express()
-        const port = 4000
+
 
         //middleware
         app.use(express.json())
@@ -27,9 +27,9 @@ const startServer = async () => {
         //api endpoints
         app.use("/api/food", foodRouter)
         app.use("/api/user", userRouter)
-        app.use("/api/cart",cartRouter)
+        app.use("/api/cart", cartRouter)
         app.use("/api/order", orderRouter)
-        
+
         app.get("/", (req, res) => {
             res.send("API Working")
         })
@@ -42,9 +42,13 @@ const startServer = async () => {
             next(err);
         });
 
-        app.listen(port, () => {
-            console.log(`Server Started on http://localhost:${port}`)
-        })
+        if (process.env.NODE_ENV !== "production") {
+            const port = 4000
+            app.listen(port, () => {
+                console.log(`Server Started on http://localhost:${port}`)
+            })
+       
+        }
     } catch (error) {
         console.error('Failed to start server:', error)
         process.exit(1)
@@ -52,3 +56,5 @@ const startServer = async () => {
 }
 
 startServer()
+
+export default startServer;
