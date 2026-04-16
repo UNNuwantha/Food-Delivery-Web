@@ -7,13 +7,14 @@ const StoreContextProvider=(props)=>{
 
     const [cartItems,setCartItems]= useState({});
     const url = "http://localhost:4000"
-    const [token, setToken] = useState("");
+    const [token, setToken] = useState(localStorage.getItem("token") || "");
     const [food_list,setFoodList] = useState([])
 
+    const authHeaders = (tokenValue) => ({ headers: { Authorization: `Bearer ${tokenValue}` } });
 
     const addToCart = async (itemId) => {
         if(token){
-            const response = await axios.post(url+"/api/cart/add", {itemId}, {headers:{token}});
+            const response = await axios.post(url+"/api/cart/add", {itemId}, authHeaders(token));
             if(response.data.success){
                 setCartItems((prev)=> ({...prev, [itemId]: prev[itemId] ? prev[itemId] + 1 : 1}))
             }
@@ -22,7 +23,7 @@ const StoreContextProvider=(props)=>{
 
     const removeFromCart = async (itemId) => {
         if(token){
-            const response = await axios.post(url+"/api/cart/remove", {itemId}, {headers:{token}});
+            const response = await axios.post(url+"/api/cart/remove", {itemId}, authHeaders(token));
             if(response.data.success){
                 setCartItems((prev)=>{
                     const newCart = {...prev};
@@ -56,7 +57,7 @@ const StoreContextProvider=(props)=>{
      
         const loadCartData = async (token) => {
             try{
-                const response = await axios.get(url+"/api/cart/get", {headers:{token}});
+                const response = await axios.get(url+"/api/cart/get", authHeaders(token));
                 if(response.data.success){
                     setCartItems(response.data.cartData);
                 }
